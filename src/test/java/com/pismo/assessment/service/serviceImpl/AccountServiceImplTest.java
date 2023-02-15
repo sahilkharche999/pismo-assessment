@@ -54,7 +54,8 @@ class AccountServiceImplTest {
     void testSave2() {
         Account account = new Account();
         account.setAccountId(3);
-        assertThrows(ResponseStatusException.class, () -> accountServiceImpl.save(account));
+        Exception exception = assertThrows(ResponseStatusException.class, () -> accountServiceImpl.save(account));
+        assertTrue(exception.getMessage().contains("Invalid document number"));
     }
 
     @Test
@@ -65,14 +66,13 @@ class AccountServiceImplTest {
         Optional<Account> ofResult = Optional.of(account);
         when(accountRepository.findByAccountId(anyInt())).thenReturn(ofResult);
         assertSame(account, accountServiceImpl.getById(1));
-        verify(accountRepository).findByAccountId(anyInt());
     }
 
     @Test
     void testGetById2() {
         when(accountRepository.findByAccountId(anyInt())).thenReturn(Optional.empty());
-        assertThrows(ResponseStatusException.class, () -> accountServiceImpl.getById(1));
-        verify(accountRepository).findByAccountId(anyInt());
+        Exception exception = assertThrows(ResponseStatusException.class, () -> accountServiceImpl.getById(1));
+        assertTrue(exception.getMessage().contains("Account not found"));
     }
 
 }
