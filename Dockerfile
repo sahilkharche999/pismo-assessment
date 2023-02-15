@@ -1,9 +1,10 @@
-FROM openjdk:11
+FROM maven:3.6.0-jdk-11-slim AS build
+COPY src /home/app/src
+COPY pom.xml /home/app
+RUN mvn -f /home/app/pom.xml clean package
 
-ARG JAR_FILE=target/pismo-assessment.jar
 
-COPY ${JAR_FILE} pismo-assessment.jar
-
+FROM openjdk:11-jre-slim
+COPY --from=build /home/app/target/pismo-assessment.jar /usr/local/lib/pismo-assessment.jar
 EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "/pismo-assessment.jar"]
+ENTRYPOINT ["java","-jar","/usr/local/lib/pismo-assessment.jar"]
